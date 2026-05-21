@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+<title>Mood Gallery</title>
+
+<!-- React -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+<!-- Babel -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+/* =========================================
+   RESET
+========================================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,
+body,
+#root{
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+
+  font-family:
+    Inter,
+    system-ui,
+    sans-serif;
+}
+
+body{
+  background:#050507;
+}
+
+/* =========================================
+   RESPONSIVE FIXES
+========================================= */
+
+:root{
+  --vh:1vh;
+}
+
+.full-height{
+  min-height:calc(var(--vh, 1vh) * 100);
+}
+
+/* Prevent Wix overflow */
+
+main{
+  width:100%;
+  overflow-x:hidden;
+}
+
+/* =========================================
+   VIDEO EXPAND
+========================================= */
+
+.video-expanded{
+  position:fixed !important;
+
+  top:0 !important;
+  left:0 !important;
+
+  width:100vw !important;
+  height:100vh !important;
+
+  z-index:9999999 !important;
+
+  background:#000 !important;
+
+  border-radius:0 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:0 !important;
+  margin:0 !important;
+}
+
+.video-expanded .aspect-video{
+  width:100vw !important;
+  height:100vh !important;
+  aspect-ratio:auto !important;
+}
+
+.video-expanded iframe{
+  width:100vw !important;
+  height:100vh !important;
+  border:none !important;
+}
+
+/* =========================================
+   GLASS
+========================================= */
+
+.glass{
+
+  background:rgba(255,255,255,0.07);
+
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.25),
+    inset 0 1px 1px rgba(255,255,255,0.03);
+
+}
+
+/* =========================================
+   UI
+========================================= */
+
+.ui{
+  transition:all 240ms ease;
+  user-select:none;
+}
+
+.ui:hover{
+  transform:translateY(-2px) scale(1.02);
+  filter:brightness(1.06);
+}
+
+.ui:active{
+  transform:scale(.98);
+}
+
+button,
+a{
+  outline:none;
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+}
+
+button:focus-visible,
+a:focus-visible{
+
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.15),
+    0 0 0 5px rgba(236,72,153,.25);
+
+}
+
+/* =========================================
+   AMBIENT LIGHTS
+========================================= */
+
+.orb{
+  position:absolute;
+  border-radius:999px;
+  filter:blur(80px);
+  opacity:.35;
+  pointer-events:none;
+
+  animation:float 18s ease-in-out infinite;
+}
+
+.orb1{
+  width:400px;
+  height:400px;
+
+  top:-120px;
+  left:-120px;
+
+  background:#ff4ecd;
+}
+
+.orb2{
+  width:500px;
+  height:500px;
+
+  bottom:-180px;
+  right:-180px;
+
+  background:#7c4dff;
+}
+
+.orb3{
+  width:300px;
+  height:300px;
+
+  top:40%;
+  left:40%;
+
+  background:#ff758f;
+}
+
+@keyframes float{
+
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(-25px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+
+}
+
+/* =========================================
+   AUDIO VISUALIZER
+========================================= */
+
+.bars{
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+
+  gap:5px;
+  height:40px;
+}
+
+.bar{
+  width:6px;
+
+  border-radius:999px;
+
+  background:linear-gradient(
+    to top,
+    #f472b6,
+    #ec4899
+  );
+
+  animation:bounce 1s ease-in-out infinite;
+}
+
+.bar:nth-child(2){animation-delay:.15s;}
+.bar:nth-child(3){animation-delay:.3s;}
+.bar:nth-child(4){animation-delay:.45s;}
+.bar:nth-child(5){animation-delay:.6s;}
+
+@keyframes bounce{
+
+  0%,100%{
+    height:10px;
+    opacity:.4;
+  }
+
+  50%{
+    height:36px;
+    opacity:1;
+  }
+
+}
+
+/* =========================================
+   POPUP
+========================================= */
+
+@keyframes fadeIn{
+
+  from{
+    opacity:0;
+    transform:scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+  .hero{
+    font-size:3.2rem !important;
+    line-height:1.05;
+  }
+
+  .orb1{
+    width:220px;
+    height:220px;
+  }
+
+  .orb2{
+    width:260px;
+    height:260px;
+  }
+
+  .orb3{
+    width:180px;
+    height:180px;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+const {
+  useState,
+  useEffect
+} = React;
+
+function MoodGallery(){
+
+  useEffect(() => {
+
+    const setVH = () => {
+
+      document.documentElement.style.setProperty(
+        '--vh',
+        `${window.innerHeight * 0.01}px`
+      );
+
+    };
+
+    setVH();
+
+    window.addEventListener('resize', setVH);
+
+    return () => window.removeEventListener('resize', setVH);
+
+  }, []);
+
+  const [scene,setScene] = useState("home");
+
+  const [dark,setDark] = useState(true);
+
+  const [showPopup,setShowPopup] = useState(true);
+
+  const [playing,setPlaying] = useState(false);
+
+  const [expandedVideo,setExpandedVideo] = useState(null);
+
+  const [currentTrack,setCurrentTrack] = useState(0);
+
+  const audioTracks = [
+
+    {
+      title:"Bob Marley — Natural Mystic 8D",
+      subtitle:"Deep immersive ambience",
+      videoUrl:"https://video.wixstatic.com/video/c15e92_3ef45bfede9c44f2bb3ef0689b1b2dba/1080p/mp4/file.mp4"
+    },
+
+    {
+      title:"Musica 8D - Tonos marcados",
+      subtitle:"Meditative sound experience",
+      videoUrl:"https://video.wixstatic.com/video/c15e92_7c6b3432a0bf464dab3a21be5479264f/360p/mp4/file.mp4"
+    },
+
+    {
+      title:"Simulador Rayo Macqueen 8D",
+      subtitle:"Relaxation and immersion",
+      videoUrl:"https://video.wixstatic.com/video/c15e92_d370786d0cc843ec99f57d7fbdf55434/360p/mp4/file.mp4"
+    }
+
+  ];
+
+  const toggleVideo = (id) => {
+    setExpandedVideo(
+      expandedVideo === id ? null : id
+    );
+  };
+
+  const background = dark
+
+  ? "bg-gradient-to-br from-black via-[#120818] to-black text-pink-100"
+
+  : "bg-gradient-to-br from-pink-50 via-white to-rose-50 text-pink-500";
+
+  const getAudio = () => {
+    return document.getElementById("bg-audio");
+  };
+
+  const playMedia = () => {
+
+    const audio = getAudio();
+
+    if(!audio) return;
+
+    audio.play();
+
+    setPlaying(true);
+
+  };
+
+  const pauseMedia = () => {
+
+    const audio = getAudio();
+
+    if(!audio) return;
+
+    audio.pause();
+
+    setPlaying(false);
+
+  };
+
+  const playTrack = (index) => {
+
+    setCurrentTrack(index);
+
+    setTimeout(() => {
+
+      const audio = getAudio();
+
+      if(!audio) return;
+
+      audio.src = audioTracks[index].videoUrl;
+
+      audio.play();
+
+      setPlaying(true);
+
+    },100);
+
+  };
+
+  const nextTrack = () => {
+
+    const next =
+      currentTrack === audioTracks.length - 1
+      ? 0
+      : currentTrack + 1;
+
+    playTrack(next);
+
+  };
+
+  const prevTrack = () => {
+
+    const prev =
+      currentTrack === 0
+      ? audioTracks.length - 1
+      : currentTrack - 1;
+
+    playTrack(prev);
+
+  };
+
+  return(
+
+    <div
+      className={`
+        ${background}
+        full-height
+        relative
+        overflow-hidden
+        transition-all
+        duration-700
+      `}
+    >
+
+      {/* AUDIO */}
+
+      <audio
+        id="bg-audio"
+        preload="auto"
+      >
+        <source
+          src={audioTracks[currentTrack].videoUrl}
+          type="video/mp4"
+        />
+      </audio>
+
+      {/* AMBIENT LIGHTS */}
+
+      <div className="orb orb1"></div>
+      <div className="orb orb2"></div>
+      <div className="orb orb3"></div>
+
+      {/* POPUP */}
+
+      {showPopup && (
+
+        <div
+          className="
+            fixed
+            inset-0
+            z-[999]
+            flex
+            items-start md:items-center
+            justify-center
+            bg-black/60
+            backdrop-blur-md
+            px-4
+            py-6
+            md:py-6
+            overflow-y-auto
+          "
+        >
+
+          <div
+            className="
+              glass
+              max-w-xl
+              w-full
+              rounded-[38px]
+              p-6 md:p-10
+              text-center
+              mt-0 md:mt-0
+              mb-auto md:mb-0
+            "
+            style={{
+              animation:"fadeIn .6s ease"
+            }}
+          >
+
+            <div
+              className="
+                w-20
+                h-20
+                md:w-24
+                md:h-24
+                mx-auto
+                rounded-full
+                bg-gradient-to-br
+                from-pink-400/30
+                to-fuchsia-500/30
+                flex
+                items-center
+                justify-center
+                text-4xl md:text-5xl
+                mb-8
+                border
+                border-white/10
+              "
+            >
+              🎧
+            </div>
+
+            <h2 className="text-3xl md:text-4xl font-thin mb-6">
+              Bienvenido a Mood Gallery
+            </h2>
+
+            <p className="opacity-75 leading-relaxed text-base md:text-lg mb-8">
+
+              Para una experiencia completamente inmersiva,
+              recomendamos utilizar auriculares y aromatizar
+              el espacio con productos de FumoNes.
+
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+
+              <a
+                href="https://fumones.wixsite.com/fumones"
+                target="_blank"
+                className="
+                  ui
+                  px-7
+                  py-4
+                  rounded-full
+                  bg-gradient-to-r
+                  from-pink-400/30
+                  to-fuchsia-500/30
+                  border
+                  border-white/10
+                "
+              >
+                Explorar Tienda
+              </a>
+
+              <button
+                onClick={() => setShowPopup(false)}
+                className="
+                  ui
+                  glass
+                  px-7
+                  py-4
+                  rounded-full
+                "
+              >
+                Entrar en la experiencia
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+      <main className="relative z-20 px-4 md:px-14 py-6 md:py-10">
+
+     <header className="fixed top-4 left-0 right-0 z-50 pointer-events-none">
+
+  {/* Mood Gallery izquierda */}
+
+  <div className="absolute left-4 top-0 pointer-events-auto">
+
+    <button
+      onClick={() => {
+
+        pauseMedia();
+        setScene("home");
+
+      }}
+      className="
+        ui
+        glass
+        px-3
+        py-2
+        rounded-full
+        text-xs
+        md:text-sm
+      "
+    >
+      Mood Gallery
+    </button>
+
+  </div>
+
+  {/* Claro / Oscuro derecha */}
+
+  <div className="absolute right-4 top-0 pointer-events-auto">
+
+    <button
+      onClick={() => setDark(!dark)}
+      className="
+        ui
+        glass
+        px-3
+        py-2
+        rounded-full
+        text-xs
+        md:text-sm
+      "
+    >
+      {dark ? "☀️ Claro" : "🌙 Oscuro"}
+    </button>
+
+  </div>
+
+</header>
+
+       {/* HOME */}
+
+        {scene === "home" && (
+
+          <section>
+
+            <div className="text-center mb-16">
+
+              <h1
+                className="
+                  hero
+                  text-6xl
+                  md:text-8xl
+                  font-thin
+                  tracking-[0.08em]
+                  bg-gradient-to-r
+                  from-pink-200
+                  via-fuchsia-300
+                  to-rose-400
+                  bg-clip-text
+                  text-transparent
+                "
+              >
+                Mood Gallery
+              </h1>
+
+              <p className="mt-5 opacity-70 text-lg">
+                 Experiencia inmersiva sensorial -
+                
+                powered by FumoNes
+              </p>
+
+            </div>
+
+            {/* CARDS */}
+
+            <div className="grid md:grid-cols-3 gap-8">
+
+              {/* AUDITIVO */}
+
+              <div
+                onClick={() => {
+
+                  pauseMedia();
+
+                  setScene("audio");
+
+                }}
+                className="
+                  ui
+                  glass
+                  p-8
+                  rounded-[32px]
+                  cursor-pointer
+                "
+              >
+
+               <div
+  className="
+    h-52
+    rounded-[26px]
+    mb-6
+    overflow-hidden
+    relative
+  "
+  style={{
+    backgroundImage:"url('https://static.wixstatic.com/media/c15e92_26c0ef531bd646359dd9f6f787e0a7c0~mv2.png')",
+    backgroundSize:"cover",
+    backgroundPosition:"center"
+  }}
+>
+  <div className="absolute inset-0 bg-black/20"></div>
+</div>
+
+                <h3 className="text-2xl font-light mb-3">
+                  Auditivo
+                </h3>
+
+                <p className="opacity-65 leading-relaxed">
+                  Sonidos ambientales y relajación profunda.
+                </p>
+
+              </div>
+
+              {/* VISUAL */}
+
+              <div
+                onClick={() => {
+
+                  pauseMedia();
+
+                  setScene("visual");
+
+                }}
+                className="
+                  ui
+                  glass
+                  p-8
+                  rounded-[32px]
+                  cursor-pointer
+                "
+              >
+
+                <div
+  className="
+    h-52
+    rounded-[26px]
+    mb-6
+    overflow-hidden
+    relative
+  "
+  style={{
+    backgroundImage:"url('https://static.wixstatic.com/media/c15e92_44d219fa99bf422fb862f71a9919f552~mv2.png')",
+    backgroundSize:"cover",
+    backgroundPosition:"center"
+  }}
+>
+  <div className="absolute inset-0 bg-black/20"></div>
+</div>
+
+                <h3 className="text-2xl font-light mb-3">
+                  Visual
+                </h3>
+
+                <p className="opacity-65 leading-relaxed">
+                  Experiencias visuales inmersivas.
+                </p>
+
+              </div>
+
+              {/* COMING SOON */}
+
+              <div
+                className="
+                  glass
+                  p-8
+                  rounded-[32px]
+                  opacity-75
+                "
+              >
+
+                <div
+  className="
+    h-52
+    rounded-[26px]
+    mb-6
+    overflow-hidden
+    relative
+  "
+  style={{
+    backgroundImage:"url('https://static.wixstatic.com/media/c15e92_36662357eb4242f296c91df7fb340201~mv2.png')",
+    backgroundSize:"cover",
+    backgroundPosition:"center"
+  }}
+>
+  <div className="absolute inset-0 bg-black/30"></div>
+</div>
+
+                <h3 className="text-2xl font-light mb-3">
+                  Próximamente
+                </h3>
+
+                <p className="opacity-65 leading-relaxed">
+                  Nuevas experiencias inmersivas están siendo desarrolladas.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        )}
+
+        {/* AUDIO */}
+
+        {scene === "audio" && (
+
+          <section className="max-w-4xl mx-auto">
+
+            <div className="glass rounded-[40px] p-10 mb-10">
+
+              <div className="text-center">
+
+                <p className="tracking-[0.3em] text-xs opacity-60 mb-4">
+                  NOW PLAYING
+                </p>
+
+                <h2
+                  onClick={() => {
+
+                    playTrack(currentTrack);
+
+                  }}
+                  className="
+                    text-4xl
+                    font-light
+                    mb-3
+                    cursor-pointer
+                    hover:opacity-80
+                    transition-all
+                  "
+                >
+                  {audioTracks[currentTrack].title}
+                </h2>
+
+                <p className="opacity-60 mb-8">
+                  {audioTracks[currentTrack].subtitle}
+                </p>
+
+                {playing && (
+
+                  <div className="bars mb-10">
+
+                    <div className="bar"></div>
+                    <div className="bar"></div>
+                    <div className="bar"></div>
+                    <div className="bar"></div>
+                    <div className="bar"></div>
+
+                  </div>
+
+                )}
+
+                <div className="flex justify-center items-center gap-5 mb-10">
+
+                  <button
+                    onClick={prevTrack}
+                    className="
+                      ui
+                      glass
+                      w-14
+                      h-14
+                      rounded-full
+                      text-lg
+                    "
+                  >
+                    ⏮
+                  </button>
+
+                  <button
+                    onClick={() => {
+
+                      playMedia();
+
+                    }}
+                    className="
+                      ui
+                      glass
+                      w-14
+                      h-14
+                      rounded-full
+                      text-lg
+                    "
+                  >
+                    ▶
+                  </button>
+
+                  <button
+                    onClick={() => {
+
+                      pauseMedia();
+
+                    }}
+                    className="
+                      ui
+                      glass
+                      w-14
+                      h-14
+                      rounded-full
+                      text-lg
+                    "
+                  >
+                    ⏸
+                  </button>
+
+                  <button
+                    onClick={nextTrack}
+                    className="
+                      ui
+                      glass
+                      w-14
+                      h-14
+                      rounded-full
+                      text-lg
+                    "
+                  >
+                    ⏭
+                  </button>
+
+                </div>
+
+                {/* TRACKS */}
+
+                <div className="grid md:grid-cols-3 gap-4">
+
+                  {audioTracks.map((track,index) => (
+
+                    <button
+                      key={index}
+                      onClick={() => playTrack(index)}
+                      className={`
+                        ui
+                        glass
+                        p-5
+                        rounded-[24px]
+                        text-left
+                        transition-all
+                        ${currentTrack === index ? "border border-pink-400/40" : ""}
+                      `}
+                    >
+
+                        <p className="text-xs opacity-50 mb-2">
+                          TRACK {index + 1}
+                        </p>
+
+                        <h3 className="text-lg font-light mb-2">
+                          {track.title}
+                        </h3>
+
+                        <p className="opacity-60 text-sm">
+                          {track.subtitle}
+                        </p>
+
+                    </button>
+
+                  ))}
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        )}
+
+        {/* VISUAL */}
+
+        {scene === "visual" && (
+
+          <section className="max-w-6xl mx-auto">
+          <div
+  className="
+    glass
+    border
+    border-red-400/30
+    rounded-[28px]
+    p-5
+    md:p-6
+    mb-8
+    bg-red-500/10
+  "
+>
+
+  <div className="flex items-start gap-4">
+
+    <div className="text-3xl">
+      ⚠️
+    </div>
+
+    <div>
+
+      <h3 className="text-xl md:text-2xl font-light mb-3 text-red-200">
+        Advertencia para personas con epilepsia fotosensible
+      </h3>
+
+      <p className="opacity-80 leading-relaxed text-sm md:text-base">
+
+        Algunas experiencias visuales incluidas en esta sección contienen
+        luces intermitentes, patrones psicodélicos y estímulos visuales
+        intensos que podrían provocar molestias o desencadenar ataques
+        en personas con epilepsia fotosensible.
+
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+            <div className="text-center mb-14">
+
+              <h2 className="text-5xl font-thin mb-4">
+                Visual Experience
+              </h2>
+
+              <p className="opacity-70 text-lg">
+                Selecciona una experiencia visual inmersiva
+              </p>
+
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+
+              {/* VIDEO 1 */}
+
+              <div
+  className={`
+    ${expandedVideo === 1
+      ? "fixed inset-0 z-[9999999] bg-black"
+      : "glass rounded-[34px] overflow-hidden"}
+  `}
+>
+
+              <div className={`
+  relative
+  bg-black
+  ${expandedVideo ? "w-screen h-screen" : "aspect-video"}
+`}>
+
+          
+
+                <a
+  href="https://www.youtube.com/watch?v=qi2xhtVCh_c"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="block w-full h-full"
+>
+
+  <img
+    src="https://img.youtube.com/vi/qi2xhtVCh_c/maxresdefault.jpg"
+    alt="Psychedelic Visual Experience"
+    className="
+      w-full
+      h-full
+      object-cover
+      transition-all
+      duration-300
+      hover:scale-[1.02]
+    "
+  />
+
+</a>
+
+                </div>
+
+                <div className="p-6">
+
+                  <p className="text-xs tracking-[0.25em] opacity-50 mb-3">
+                    IMMERSIVE VISUAL
+                  </p>
+
+                  <h3 className="text-2xl font-light mb-3">
+                    Psychedelic Dream Experience
+                  </h3>
+
+                  <p className="opacity-65 leading-relaxed">
+
+                    Visual psicodélico inmersivo diseñado
+                    para relajación profunda, contemplación
+                    y experiencias audiovisuales sensoriales.
+
+                  </p>
+
+                </div>
+
+              </div>
+
+              {/* VIDEO 2 */}
+
+              <div className={`
+                glass
+                rounded-[34px]
+                overflow-hidden
+                ${expandedVideo === 2 ? "video-expanded" : ""}
+              `}>
+
+                <div className="aspect-video relative bg-black">
+
+
+
+                  <a
+  href="https://www.youtube.com/watch?v=3pxrECZYEAA"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="block w-full h-full"
+>
+
+  <img
+    src="https://img.youtube.com/vi/3pxrECZYEAA/maxresdefault.jpg"
+    alt="Psychedelic Visual Experience"
+    className="
+      w-full
+      h-full
+      object-cover
+      transition-all
+      duration-300
+      hover:scale-[1.02]
+    "
+  />
+
+</a>
+
+                </div>
+
+                <div className="p-6">
+
+                  <p className="text-xs tracking-[0.25em] opacity-50 mb-3">
+                    IMMERSIVE VISUAL
+                  </p>
+
+                  <h3 className="text-2xl font-light mb-3">
+                    Fumaos Sensory Experience
+                  </h3>
+
+                  <p className="opacity-65 leading-relaxed">
+
+                    Experiencia audiovisual inmersiva
+                    diseñada para sesiones sensoriales,
+                    relajación profunda y estimulación visual.
+
+                  </p>
+
+                </div>
+
+              </div>
+              {/* VIDEO 3 */}
+
+<div className={`
+  glass
+  rounded-[34px]
+  overflow-hidden
+  ${expandedVideo === 3 ? "video-expanded" : ""}
+`}>
+
+  <div className="aspect-video relative bg-black">
+
+   
+
+    <a
+  href="https://www.youtube.com/watch?v=eV4wmLbRKiM"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="block w-full h-full"
+>
+
+  <img
+    src="https://img.youtube.com/vi/eV4wmLbRKiM/maxresdefault.jpg"
+    alt="Psychedelic Visual Experience"
+    className="
+      w-full
+      h-full
+      object-cover
+      transition-all
+      duration-300
+      hover:scale-[1.02]
+    "
+  />
+
+</a>
+  </div>
+
+  <div className="p-6">
+
+    <p className="text-xs tracking-[0.25em] opacity-50 mb-3">
+      IMMERSIVE VISUAL
+    </p>
+
+    <h3 className="text-2xl font-light mb-3">
+      Nuevo Visual Experience
+    </h3>
+
+    <p className="opacity-65 leading-relaxed">
+
+      Descripción de la nueva experiencia visual inmersiva.
+
+    </p>
+
+  </div>
+
+</div>
+
+            </div>
+
+          </section>
+
+        )}
+
+      </main>
+
+    </div>
+
+  );
+
+}
+
+const root = ReactDOM.createRoot(
+  document.getElementById("root")
+);
+
+root.render(<MoodGallery />);
+
+</script>
+
+</body>
+</html>
